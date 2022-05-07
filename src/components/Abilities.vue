@@ -1,5 +1,9 @@
 <template>
-  <div v-for="ability of unitAbilities" :key="ability.name" class="mb-5">
+  <div
+    v-for="ability of unitAbilities"
+    :key="ability.name"
+    class="mb-5"
+  >
     <h4>{{ ability.name }}</h4>
     <p>{{ ability.abilityDetails }}</p>
   </div>
@@ -12,7 +16,7 @@ export default {
   props: {
     abilities: {
       type: Object,
-      requires: true,
+      required: true,
     },
   },
 
@@ -22,7 +26,7 @@ export default {
         return this.abilities;
       }
       return [this.abilities];
-    }
-  }
+    },
+  },
 };
 </script>

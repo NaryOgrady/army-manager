@@ -1,8 +1,8 @@
 <template>
   <v-navigation-drawer v-model="drawer">
     <v-list-item
-      prepend-avatar="https://randomuser.me/api/portraits/men/78.jpg"
-      title="John Leider"
+      prepend-avatar="mi-amor.jpg"
+      title="Jess Lee"
     />
 
     <v-divider></v-divider>
@@ -14,6 +14,13 @@
         value="home"
         @click="activePage = 'units'"
         :active="activePage === 'units'"
+      />
+      <v-list-item
+        prepend-icon="mdi-clipboard-list"
+        title="Allegiance"
+        value="allegiance"
+        @click="activePage = 'allegiance'"
+        :active="activePage === 'allegiance'"
       />
       <v-list-item
         prepend-icon="mdi-clipboard-list"
@@ -33,6 +40,13 @@
           </v-btn>
         </units>
       </div>
+      <div v-if="activePage === 'allegiance'">
+        <allegiance :allegiance-info="allegiance">
+          <v-btn variant="plain" @click="drawer = !drawer">
+            <v-icon size="x-large">mdi-menu</v-icon>
+          </v-btn>
+        </allegiance>
+      </div>
       <div v-if="activePage === 'phases'">
         <phases :abilities="{}">
           <v-btn variant="plain" @click="drawer = !drawer">
@@ -47,6 +61,7 @@
 <script>
 import Units from "./Units.vue";
 import Phases from './Phases.vue';
+import Allegiance from './Allegiance.vue';
 
 export default {
   name: 'ViewRoster',
@@ -54,6 +69,7 @@ export default {
   components: {
     Units,
     Phases,
+    Allegiance,
   },
 
   props: {
@@ -69,6 +85,12 @@ export default {
       activePage: 'units',
     };
   },
+
+  computed: {
+    allegiance() {
+      return this.roster.find(cat => cat.name === 'Allegiance');
+    }
+  }
 };
 </script>
 

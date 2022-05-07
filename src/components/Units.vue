@@ -2,39 +2,104 @@
   <v-row>
     <v-col>
       <div class="d-flex">
-        <v-select v-model="selectedCategory" :items="categories" label="category" />
+        <v-select
+          v-model="selectedCategory"
+          :items="categories"
+          label="category"
+        />
         <slot />
       </div>
     </v-col>
   </v-row>
   <v-carousel
+    v-model="carouselIndex"
     height="auto"
     :show-arrows="showArrows"
     vertical
-    v-model="carouselIndex"
     @change="setShowArrowsTrue"
   >
-    <v-carousel-item v-for="unit of units" :key="unit.unit.name">
+    <v-carousel-item
+      v-for="(unit, i) of units"
+      :key="i + 'ci'"
+    >
       <div class="pb-60">
         <v-row>
           <v-col>
-            <h3>{{ unit.unit.name }}</h3>
+            <h3 v-if="selectedCategory.includes('Malign Sorcery')">
+              {{ unit.name }}
+            </h3>
+            <h3 v-else>
+              {{ unit.unit.name }}
+            </h3>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="selectedCategory.includes('Malign Sorcery')">
+          <v-col>
+            <v-table>
+              <thead>
+                <th
+                  v-for="key of Object.keys(unit.spell)"
+                  :key="key + 'header'"
+                >
+                  {{ key }}
+                </th>
+              </thead>
+              <tbody>
+                <td
+                  v-for="key of Object.keys(unit.spell)"
+                  :key="key + 'data'"
+                >
+                  {{ unit.spell[key] }}
+                </td>
+              </tbody>
+            </v-table>
+          </v-col>
+        </v-row>
+        <v-row v-else>
           <v-col>
             <div class="stats">
-              <div class="stats__move">{{ unit.unit.move }}</div>
-              <div class="stats__wounds">{{ unit.unit.wounds }}</div>
-              <div class="stats__save">{{ unit.unit.save }}</div>
-              <div class="stats__bravery">{{ unit.unit.bravery }}</div>
+              <div class="stats__move">
+                {{ unit.unit.move }}
+              </div>
+              <div class="stats__wounds">
+                {{ unit.unit.wounds }}
+              </div>
+              <div class="stats__save">
+                {{ unit.unit.save }}
+              </div>
+              <div class="stats__bravery">
+                {{ unit.unit.bravery }}
+              </div>
             </div>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row v-if="selectedCategory.includes('Malign Sorcery')">
           <v-col>
-            <v-expansion-panels variant="popout" multiple v-model="panels">
-              <v-expansion-panel v-if="unit.weapon" value="weapons">
+            <div
+              v-for="ability of unit.unitAbilities"
+              :key="ability"
+              class="mb-5"
+            >
+              <h3 class="mb-2">
+                {{ ability.name }}
+              </h3>
+              <p>
+                {{ ability.abilityDetails }}
+              </p>
+            </div>
+          </v-col>
+        </v-row>
+        <v-row v-else>
+          <v-col>
+            <v-expansion-panels
+              v-model="panels"
+              variant="popout"
+              multiple
+            >
+              <v-expansion-panel
+                v-if="unit.weapon"
+                value="weapons"
+              >
                 <v-expansion-panel-title>Weapons</v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <weapons :weapon-data="unit.weapon" />
@@ -46,7 +111,10 @@
                   <damage-table :damage-table="getDamageTable(unit)" />
                 </v-expansion-panel-text>
               </v-expansion-panel>
-              <v-expansion-panel v-if="isLeader" value="leaderInfo">
+              <v-expansion-panel
+                v-if="isLeader"
+                value="leaderInfo"
+              >
                 <v-expansion-panel-title>Leader Info</v-expansion-panel-title>
                 <v-expansion-panel-text>
                   <leader-info :unit="unit" />
@@ -76,7 +144,7 @@
 import Weapons from './Weapons.vue';
 import LeaderInfo from './LeaderInfo.vue';
 import Abilities from './Abilities.vue';
-import Magic from './Magic.vue'
+import Magic from './Magic.vue';
 import DamageTable from './DamageTable.vue';
 
 export default {
@@ -94,7 +162,7 @@ export default {
     roster: {
       type: Object,
       required: true,
-    }
+    },
   },
 
   data() {
@@ -109,7 +177,8 @@ export default {
 
   computed: {
     categories() {
-      return this.roster.filter(cat => cat.name !== 'Allegiance' && cat.name !== 'Game Options')
+      const ignoredCategories = ['Allegiance', 'Game Options', 'Core Battalion'];
+      return this.roster.filter(cat => !ignoredCategories.includes(cat.name))
         .map(cat => cat.name);
     },
 
@@ -136,7 +205,7 @@ export default {
     if (!this.roster.length) {
       throw new Error('Invalid Roster');
     }
-    this.selectedCategory = this.roster[0].name;
+    this.selectedCategory = this.roster.find(cat => cat.name.includes('Leader')).name;
     this.setShowArrowsTrue();
   },
 
@@ -150,11 +219,10 @@ export default {
     },
 
     getDamageTable(unit) {
-      console.log('test');
       if (unit.damageTable) {
         return unit.damageTable;
       }
-      return unit[`${this.camelize(unit.unit.name)}Wounds`]
+      return unit[`${this.camelize(unit.unit.name)}Wounds`];
     },
 
     camelize(str) {
@@ -163,7 +231,7 @@ export default {
         if (+match === 0) return ""; // or if (/\s+/.test(match)) for white spaces
         return index === 0 ? match.toLowerCase() : match.toUpperCase();
       });
-    }
+    },
   },
 };
 </script>

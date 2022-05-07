@@ -1,20 +1,27 @@
 <template>
   <div
     v-for="weapon of weapons"
-    :key="weapon.name" class="mb-5"
+    :key="weapon.name"
+    class="mb-5"
   >
     <h4>{{ `${weapon.name} - ${weapon.type.toLowerCase()}` }}</h4>
     <v-table>
       <thead>
         <tr>
-          <th v-for="header of headers" :key="header">
+          <th
+            v-for="header of headers"
+            :key="header"
+          >
             {{ header }}
           </th>
         </tr>
       </thead>
       <tbody @touchend.stop="null">
         <tr>
-          <td v-for="header of headers" :key="header">
+          <td
+            v-for="header of headers"
+            :key="header"
+          >
             {{ weapon[header] }}
           </td>
         </tr>
@@ -31,7 +38,7 @@ export default {
     weaponData: {
       type: Object,
       required: true,
-    }
+    },
   },
 
 
@@ -45,7 +52,7 @@ export default {
 
     headers() {
       return Object.keys(this.weapons[0]).filter(key => key !== 'name' && key !== 'type');
-    }
-  }
-}
+    },
+  },
+};
 </script>
